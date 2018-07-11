@@ -196,11 +196,7 @@ public class Main extends AppCompatActivity {
 
 
 
-//        渲染djcontain
 
-//        mapcontain.setVisibility(View.VISIBLE);
-//        navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
-//        djcontain.setVisibility(View.GONE);
 //        暂时隐藏mapr
         navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
 //        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
