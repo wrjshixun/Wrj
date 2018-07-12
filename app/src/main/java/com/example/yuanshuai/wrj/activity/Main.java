@@ -1,6 +1,8 @@
 package com.example.yuanshuai.wrj.activity;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.SurfaceTexture;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -9,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,14 +25,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.MapView;
 import com.example.yuanshuai.wrj.R;
 import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
+import com.example.yuanshuai.wrj.application.MyFPVApplication;
 
-public class Main extends AppCompatActivity {
+import dji.common.camera.SystemState;
+import dji.common.error.DJIError;
+import dji.common.product.Model;
+import dji.common.useraccount.UserAccountState;
+import dji.common.util.CommonCallbacks;
+import dji.sdk.base.BaseProduct;
+import dji.sdk.camera.Camera;
+import dji.sdk.camera.VideoFeeder;
+import dji.sdk.codec.DJICodecManager;
+import dji.sdk.useraccount.UserAccountManager;
+
+public class Main extends AppCompatActivity implements TextureView.SurfaceTextureListener {
 
 //
     // Used to load the 'native-lib' library on application startup.
@@ -89,58 +105,23 @@ public class Main extends AppCompatActivity {
     private RelativeLayout dcontainer;
     private TextureView video;
     private View vview;
+
+
+    private static final String TAG = "dj";
+    protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
+
+    // Codec for video live view
+    protected DJICodecManager mCodecManager = null;
+    private Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
-//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        // Example of a call to a native method
-//        TextView tv = (TextView) findViewById(R.id.sample_text);
-//        tv.setText(stringFromJNI());
+        initView(savedInstanceState);
 
-        initView();
-        mview=LayoutInflater.from(this).inflate(R.layout.mapview,null);
-        map=(MapView) mview.findViewById(R.id.map);
-        map.onCreate(savedInstanceState);
-        if(aMap==null){
-            aMap=map.getMap();
-        }
-
-        mapcontainer.addView(mview,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        mapcontainer.addView(cover,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        vview=LayoutInflater.from(this).inflate(R.layout.vidview,null);
-        maptools.setVisibility(View.GONE);
-        video=(TextureView)vview.findViewById(R.id.video);
-        dcontainer.addView(video,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        cover.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(b){
-                    mapcontainer.removeAllViews();
-                    dcontainer.removeAllViews();
-                    dcontainer.addView(mview,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-                    mapcontainer.addView(video);
-                    mapcontainer.addView(cover);
-                    maptools.setVisibility(View.VISIBLE);
-
-                    b=false;
-                }
-                else{
-                    mapcontainer.removeAllViews();
-                    dcontainer.removeAllViews();
-                    dcontainer.addView(video,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-                    mapcontainer.addView(map);
-                    mapcontainer.addView(cover);
-                    maptools.setVisibility(View.GONE);
-                    b=true;
-                }
-            }
-        });
 
 
     }
@@ -151,7 +132,7 @@ public class Main extends AppCompatActivity {
 
 
 //    绑定界面
-    private void initView(){
+    private void initView(Bundle savedInstanceState){
         cover=new RelativeLayout(this);
         setting = (ImageView)findViewById(R.id.setting);
         drawerLayout=(DrawerLayout)findViewById(R.id.drawerlayoout);
@@ -199,7 +180,6 @@ public class Main extends AppCompatActivity {
 
 //        暂时隐藏mapr
         navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
-//        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
 
 
 
@@ -221,6 +201,48 @@ public class Main extends AppCompatActivity {
                 drawerLayout.openDrawer(Gravity.RIGHT);
             }
         });
+
+
+        mview=LayoutInflater.from(this).inflate(R.layout.mapview,null);
+        map=(MapView) mview.findViewById(R.id.map);
+        map.onCreate(savedInstanceState);
+        if(aMap==null){
+            aMap=map.getMap();
+        }
+
+        mapcontainer.addView(mview,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mapcontainer.addView(cover,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        vview=LayoutInflater.from(this).inflate(R.layout.vidview,null);
+        maptools.setVisibility(View.GONE);
+        video=(TextureView)vview.findViewById(R.id.video);
+        video.setSurfaceTextureListener(this);
+        dcontainer.addView(video,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        cover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(b){
+                    mapcontainer.removeAllViews();
+                    dcontainer.removeAllViews();
+                    dcontainer.addView(mview,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                    mapcontainer.addView(video);
+                    mapcontainer.addView(cover);
+                    maptools.setVisibility(View.VISIBLE);
+
+                    b=false;
+                }
+                else{
+                    mapcontainer.removeAllViews();
+                    dcontainer.removeAllViews();
+                    dcontainer.addView(video,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+                    mapcontainer.addView(map);
+                    mapcontainer.addView(cover);
+                    maptools.setVisibility(View.GONE);
+                    b=true;
+                }
+            }
+        });
     }
 
 
@@ -240,20 +262,25 @@ public class Main extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         map.onPause();
+        uninitPreviewer();
+        super.onPause();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         map.onResume();
+        initPreviewer();
+        onProductChange();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         map.onDestroy();
+        uninitPreviewer();
+        super.onDestroy();
     }
 
     @Override
@@ -267,9 +294,146 @@ public class Main extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+//    关闭侧滑
     public void closeDrawer(View v){
         drawerLayout.closeDrawer((Gravity.RIGHT));
     }
+
+    private void initPreviewer() {
+
+        BaseProduct product = MyFPVApplication.getProductInstance();
+
+        if (product == null || !product.isConnected()) {
+            showToast(getString(R.string.disconnected));
+        } else {
+            if (null != video) {
+                video.setSurfaceTextureListener(this);
+            }
+            if (!product.getModel().equals(Model.UNKNOWN_AIRCRAFT)) {
+                VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(mReceivedVideoDataCallBack);
+            }
+        }
+    }
+
+    private void uninitPreviewer() {
+        Camera camera = MyFPVApplication.getCameraInstance();
+        if (camera != null){
+            // Reset the callback
+            VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
+        }
+    }
+    public void showToast(final String msg) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(Main.this, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    protected void onProductChange() {
+        initPreviewer();
+        loginAccount();
+    }
+
+    private void loginAccount(){
+
+        UserAccountManager.getInstance().logIntoDJIUserAccount(this,
+                new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
+                    @Override
+                    public void onSuccess(final UserAccountState userAccountState) {
+                        Log.e(TAG, "Login Success");
+                    }
+                    @Override
+                    public void onFailure(DJIError error) {
+                        showToast("Login Error:"
+                                + error.getDescription());
+                    }
+                });
+    }
+    private void initCamera(){
+        mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
+
+            @Override
+            public void onReceive(byte[] videoBuffer, int size) {
+                if (mCodecManager != null) {
+                    mCodecManager.sendDataToDecoder(videoBuffer, size);
+                }
+            }
+        };
+
+        Camera camera = MyFPVApplication.getCameraInstance();
+
+        if (camera != null) {
+
+            camera.setSystemStateCallback(new SystemState.Callback() {
+                @Override
+                public void onUpdate(SystemState cameraSystemState) {
+                    if (null != cameraSystemState) {
+
+                        int recordTime = cameraSystemState.getCurrentVideoRecordingTimeInSeconds();
+                        int minutes = (recordTime % 3600) / 60;
+                        int seconds = recordTime % 60;
+
+                        final String timeString = String.format("%02d:%02d", minutes, seconds);
+                        final boolean isVideoRecording = cameraSystemState.isRecording();
+
+//                        Main.this.runOnUiThread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//
+//                                recordingTime.setText(timeString);
+//
+//                                /*
+//                                 * Update recordingTime TextView visibility and mRecordBtn's check state
+//                                 */
+//                                if (isVideoRecording){
+//                                    recordingTime.setVisibility(View.VISIBLE);
+//                                }else
+
+//                                    recordingTime.setVisibility(View.INVISIBLE);
+//                                }
+//                            }
+//                        });
+                    }
+                }
+            });
+
+        }
+    }
+
+
+
+
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.e(TAG, "onSurfaceTextureAvailable");
+        if (mCodecManager == null) {
+            mCodecManager = new DJICodecManager(this, surface, width, height);
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+        Log.e(TAG, "onSurfaceTextureSizeChanged");
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        Log.e(TAG,"onSurfaceTextureDestroyed");
+        if (mCodecManager != null) {
+            mCodecManager.cleanSurface();
+            mCodecManager = null;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    }
+
 }
 
 

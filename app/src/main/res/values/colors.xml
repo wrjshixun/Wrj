@@ -18,4 +18,9 @@
     <color name="topbar">#aaffffff</color>
     <!--白色透明背景-->
     <color name="ablack">#aa101010</color>
+
+
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#ff000000</color>
 </resources>
