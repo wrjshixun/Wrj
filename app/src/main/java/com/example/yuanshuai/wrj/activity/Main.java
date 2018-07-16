@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -34,6 +35,7 @@ import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
 import com.example.yuanshuai.wrj.application.MyFPVApplication;
 
+import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.product.Model;
@@ -107,6 +109,13 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private View vview;
 
 
+    //上方的三个图标状态显示：wifi，电池，？
+
+
+
+    //下方三个按钮
+    private Button takephoto;
+
     private static final String TAG = "dj";
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
 
@@ -148,6 +157,17 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         channelAdapter=new ChannelAdapter(this);
         listname=(TextView)findViewById(R.id.settingname);
         container=(LinearLayout) findViewById(R.id.container);
+
+        //batterystate=(ImageView) findViewById(R.id.batteryview);
+        takephoto=(Button) findViewById(R.id.take);
+        takephoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureAction();
+            }
+        });
+
+
         init();
         settinglistAdapter=new SettinglistAdapter(this);
         settinglist.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
@@ -173,6 +193,9 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         container.addView(views[0],new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         settinglist.setAdapter(settinglistAdapter);
 //        渲染mapcontain
+
+
+
 
 
 
@@ -243,6 +266,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 }
             }
         });
+
     }
 
 
@@ -403,6 +427,37 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     }
 
 
+    // Method for taking photo
+    private void captureAction(){
+
+        final Camera camera = MyFPVApplication.getCameraInstance();
+        if (camera != null) {
+
+            SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
+            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback(){
+                @Override
+                public void onResult(DJIError djiError) {
+                    if (null == djiError) {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                camera.startShootPhoto(new CommonCallbacks.CompletionCallback() {
+                                    @Override
+                                    public void onResult(DJIError djiError) {
+                                        if (djiError == null) {
+                                            showToast("take photo: success");
+                                        } else {
+                                            showToast(djiError.getDescription());
+                                        }
+                                    }
+                                });
+                            }
+                        }, 2000);
+                    }
+                }
+            });
+        }
+    }
 
 
 
