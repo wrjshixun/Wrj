@@ -49,7 +49,7 @@ import dji.sdk.useraccount.UserAccountManager;
 
 public class Main extends AppCompatActivity implements TextureView.SurfaceTextureListener {
 
-//
+    //
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
@@ -67,34 +67,34 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private RelativeLayout cover;
-//    地图侧滑容器
+    //    地图侧滑容器
     private LinearLayout mapcontain;
-//    大疆侧滑容器
+    //    大疆侧滑容器
     private LinearLayout djcontain;
-//    设置列表
+    //    设置列表
     private RecyclerView settinglist;
 
-//    信道列表
+    //    信道列表
     private RecyclerView channelist;
-//    设置页面容器
+    //    设置页面容器
     private LinearLayout container;
     private SettinglistAdapter settinglistAdapter;
     private ChannelAdapter channelAdapter;
     private TextView listname;
 
-//    侧滑页的五个子页面
+    //    侧滑页的五个子页面
     private View view1;
     private View view2;
     private View view3;
     private View view4;
     private View view5;
     private View[] views=null;
-//    主页侧滑开关
+    //    主页侧滑开关
     private ImageView setting;
     private boolean b=true;
 //    b为true的时候，小地图，开启监听事件，b为false的时候，大地图，禁用监听事件
 
-//    地图
+    //    地图
     private MapView map;
     private AMap aMap;
     private RelativeLayout mapcontainer;
@@ -103,7 +103,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private ImageView locate;
     private ImageView layer;
 
-//    无人机
+    //    无人机
     private RelativeLayout dcontainer;
     private TextureView video;
     private View vview;
@@ -133,7 +133,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 
 
 
-//    绑定界面
+    //    绑定界面
     private void initView(Bundle savedInstanceState){
         cover=new RelativeLayout(this);
         setting = (ImageView)findViewById(R.id.setting);
@@ -249,7 +249,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 
 
 
-//    初始化侧滑页的五个子页面
+    //    初始化侧滑页的五个子页面
     public void init(){
         view1= LayoutInflater.from(this).inflate(R.layout.takeoption,null);
         view2=LayoutInflater.from(this).inflate(R.layout.flyoption,null);
@@ -296,7 +296,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
      * which is packaged with this application.
      */
     public native String stringFromJNI();
-//    关闭侧滑
+    //    关闭侧滑
     public void closeDrawer(View v){
         drawerLayout.closeDrawer((Gravity.RIGHT));
     }
