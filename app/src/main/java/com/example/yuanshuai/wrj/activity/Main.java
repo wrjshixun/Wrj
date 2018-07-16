@@ -34,6 +34,8 @@ import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
 import com.example.yuanshuai.wrj.application.MyFPVApplication;
 
+import java.nio.ByteBuffer;
+
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.product.Model;
@@ -411,6 +413,15 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         Log.e(TAG, "onSurfaceTextureAvailable");
         if (mCodecManager == null) {
             mCodecManager = new DJICodecManager(this, surface, width, height);
+            mCodecManager.setYuvDataCallback(new DJICodecManager.YuvDataCallback() {
+                @Override
+                public void onYuvDataReceived(ByteBuffer byteBuffer, int i, int i1, int i2) {
+                    //                    ByteBuffer yuvFrame	YUV data buffer in the codec.
+//                    int dataSize	size of the YUV data
+//                    int width	width of the video
+//                    int height	height of the video
+                }
+            });
         }
     }
 
