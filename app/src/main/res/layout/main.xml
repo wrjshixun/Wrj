@@ -10,12 +10,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
 
-            android:id="@+id/vedio_contain">
-        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/vedio_contain"
+            android:layout_width="match_parent"
+
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"></RelativeLayout>
         <RelativeLayout
             android:layout_width="150dp"
             android:layout_height="90dp"
@@ -187,18 +189,22 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:id="@+id/l1">
-            <ImageView
+
+            <dji.ux.widget.WiFiSignalWidget
+                android:id="@+id/wifistate"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
                 android:padding="3dp"
-                android:src="@mipmap/wifi_n"
-                android:layout_marginLeft="10dp"/>
-            <ImageView
+                />
+
+            <dji.ux.widget.BatteryWidget
+                android:id="@+id/baterystate"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
                 android:padding="3dp"
-                android:src="@mipmap/batery_n"
-                android:layout_marginLeft="10dp"/>
+                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -232,31 +238,39 @@
             android:background="@color/topbar"
             android:layout_alignBaseline="@+id/l1"
             >
+
             <TextView
+                android:id="@+id/h"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
-                android:text="H:0.0M"/>
+                android:text="H:0.0M" />
+
             <TextView
+                android:id="@+id/d"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
-                android:text="D:N/A"/>
+                android:text="D:N/A" />
+
             <TextView
+                android:id="@+id/vs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
-                android:text="V.S:0.0M/S"/>
+                android:text="V.S:0.0M/S" />
+
             <TextView
+                android:id="@+id/hs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
-                android:text="H.S:0.0M/S"
-                android:layout_marginRight="5dp"/>
+                android:layout_marginRight="5dp"
+                android:text="H.S:0.0M/S" />
         </LinearLayout>
         <ImageView
             android:layout_width="30dp"
@@ -273,7 +287,7 @@
         <ImageView
             android:id="@+id/setting"
             android:layout_width="30dp"
-            android:layout_height="26dp"
+            android:layout_height="30dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="10dp"
             android:layout_toLeftOf="@+id/user"
@@ -351,6 +365,7 @@
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginLeft="5dp"
+                    android:id="@+id/standard"
                     android:layout_gravity="center_vertical"
                     android:background="@color/back1"
                     android:layout_marginRight="20dp"
@@ -378,6 +393,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="center_vertical"
                     android:background="@color/back1"
+                    android:id="@+id/satellite"
                     android:layout_marginRight="20dp"
                     />
             </LinearLayout>
@@ -394,6 +410,33 @@
                     android:layout_marginLeft="20dp"
                     android:layout_weight="1"
                     android:text="夜晚"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="15sp"
+                    android:textColor="@color/white"/>
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_gravity="center_vertical"
+                    android:id="@+id/night"
+                    android:background="@color/back1"
+                    android:layout_marginRight="20dp"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:weightSum="1"
+                android:id="@+id/offline"
+                android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"
+                    android:text="离线地图"
                     android:layout_gravity="center_vertical"
                     android:textSize="15sp"
                     android:textColor="@color/white"/>

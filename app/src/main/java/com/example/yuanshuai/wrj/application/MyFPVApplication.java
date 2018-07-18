@@ -27,6 +27,7 @@ public class MyFPVApplication extends Application {
     private BaseProduct.BaseProductListener mDJIBaseProductListener;
     private BaseComponent.ComponentListener mDJIComponentListener;
     private static BaseProduct mProduct;
+    private static DJISDKManager djisdkManager;
     public Handler mHandler;
 
     private Application instance;
@@ -54,6 +55,8 @@ public class MyFPVApplication extends Application {
         }
         return mProduct;
     }
+//    获取wifi状态
+
 
     public static synchronized Camera getCameraInstance() {
 
@@ -70,6 +73,7 @@ public class MyFPVApplication extends Application {
 
         return camera;
     }
+
 
     @Override
     public void onCreate() {

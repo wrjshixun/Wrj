@@ -48,7 +48,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="3d2d554bfe8b977d7950de5232afaf64" />
+            android:value="250ca3aaf6a9b7cbc4eba358edf49f2b" />
         <!-- DJI SDK -->
         <uses-library android:name="com.android.future.usb.accessory" />
 
@@ -68,8 +68,11 @@
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />
         </activity>
+        <!--离线地图-->
+        <activity android:name="com.amap.api.maps.offlinemap.OfflineMapActivity"
+            android:screenOrientation="portrait"  />
 
-        <service android:name="dji.sdk.sdkmanager.DJIGlobalService"></service>
+        <service android:name="dji.sdk.sdkmanager.DJIGlobalService" />
 
         <activity
             android:name=".activity.ConnectionActivity"
@@ -77,14 +80,23 @@
         <activity
             android:name=".activity.Main"
             android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+            android:theme="@style/Theme.Design.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.Login"></activity>
+        <activity
+            android:name=".activity.Login"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".activity.Register"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activity.Infomation" />
+        <activity android:name=".activity.PicManager"></activity>
     </application>
 
 </manifest>

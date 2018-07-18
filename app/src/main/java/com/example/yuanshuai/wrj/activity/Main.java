@@ -1,7 +1,10 @@
 package com.example.yuanshuai.wrj.activity;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.SurfaceTexture;
+import android.icu.text.IDNA;
+import android.media.Image;
 import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
@@ -27,12 +30,24 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.MapView;
+
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMapOptions;
+import com.amap.api.maps.CameraUpdate;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
+import com.dji.mapkit.maps.DJIMap;
 import com.example.yuanshuai.wrj.R;
 import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
 import com.example.yuanshuai.wrj.application.MyFPVApplication;
+import com.example.yuanshuai.wrj.model.UserInfoOutput;
+import com.example.yuanshuai.wrj.net.Net;
 
 import java.nio.ByteBuffer;
 
@@ -45,7 +60,12 @@ import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
+import dji.sdk.flightcontroller.FlightController;
+import dji.sdk.products.Aircraft;
+import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
+import dji.ux.widget.BatteryWidget;
+import dji.ux.widget.WiFiSignalWidget;
 
 public class Main extends AppCompatActivity implements TextureView.SurfaceTextureListener {
 
@@ -97,11 +117,12 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     //    地图
     private MapView map;
     private AMap aMap;
+    private UiSettings uiSettings;
     private RelativeLayout mapcontainer;
     private View mview;
     private RelativeLayout maptools;
-    private ImageView locate;
-    private ImageView layer;
+    private LinearLayout offline;
+    private LatLng latLng=new LatLng(36.66694, 117.14017);                           //无人机当前位置
 
     //    无人机
     private RelativeLayout dcontainer;
@@ -109,6 +130,31 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private View vview;
 
 
+
+
+//    主页控件
+    private WiFiSignalWidget wifistate;
+    private BatteryWidget baterystate;
+    private TextView batery;
+    private TextView distance;
+    private TextView h;
+    private TextView d;
+    private TextView vs;
+    private TextView hs;
+    private ImageView pic;
+    private ImageView user;
+    private ImageView locate;
+    private ImageView layer;
+    private ImageView detect;
+    private ImageView v;                                                  //录像按钮
+    private ImageView take;
+    private ImageView up;
+    private ImageView down;
+
+//  侧滑控件
+    private ImageView standard;
+    private ImageView satelite;
+    private ImageView night;
     private static final String TAG = "dj";
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
 
@@ -123,6 +169,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         setContentView(R.layout.main);
 
         initView(savedInstanceState);
+        viewBind();
 
 
 
@@ -145,11 +192,30 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         dcontainer=(RelativeLayout)findViewById(R.id.vedio_contain);
         settinglist=(RecyclerView)findViewById(R.id.settinglist);
         maptools=(RelativeLayout)findViewById(R.id.maptools);
+        offline=(LinearLayout)findViewById(R.id.offline);
         layer=(ImageView)findViewById(R.id.layer);
         locate=(ImageView)findViewById(R.id.locate);
         channelAdapter=new ChannelAdapter(this);
         listname=(TextView)findViewById(R.id.settingname);
         container=(LinearLayout) findViewById(R.id.container);
+        wifistate=(WiFiSignalWidget) findViewById(R.id.wifistate);
+        baterystate=(BatteryWidget) findViewById(R.id.baterystate);
+        batery=(TextView)findViewById(R.id.batery);
+        distance=(TextView)findViewById(R.id.distance);
+        h=(TextView)findViewById(R.id.h);
+        d=(TextView)findViewById(R.id.d);
+        vs=(TextView)findViewById(R.id.vs);
+        hs=(TextView)findViewById(R.id.hs);
+        pic=(ImageView)findViewById(R.id.pic);
+        user=(ImageView)findViewById(R.id.user);
+        up=(ImageView)findViewById(R.id.up);
+        down=(ImageView)findViewById(R.id.down);
+        v=(ImageView)findViewById(R.id.video);
+        take=(ImageView)findViewById(R.id.take);
+        detect=(ImageView)findViewById(R.id.detect);
+        standard=(ImageView)findViewById(R.id.standard);
+        satelite = (ImageView)findViewById(R.id.satellite);
+        night=(ImageView)findViewById(R.id.night);
         init();
         settinglistAdapter=new SettinglistAdapter(this);
         settinglist.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
@@ -174,44 +240,18 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         channelAdapter.setDefItem(0);
         container.addView(views[0],new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         settinglist.setAdapter(settinglistAdapter);
-//        渲染mapcontain
-
-
-
-
-
-//        暂时隐藏mapr
         navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
-
-
-
-        setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mapcontain.setVisibility(View.GONE);
-                djcontain.setVisibility(View.VISIBLE);
-                navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
-                drawerLayout.openDrawer(Gravity.RIGHT);
-            }
-        });
-        layer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mapcontain.setVisibility(View.VISIBLE);
-                djcontain.setVisibility(View.GONE);
-                navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
-                drawerLayout.openDrawer(Gravity.RIGHT);
-            }
-        });
-
-
         mview=LayoutInflater.from(this).inflate(R.layout.mapview,null);
         map=(MapView) mview.findViewById(R.id.map);
+//        initMap
         map.onCreate(savedInstanceState);
         if(aMap==null){
             aMap=map.getMap();
+            uiSettings=aMap.getUiSettings();
         }
-
+        uiSettings.setZoomControlsEnabled(false);
+        uiSettings.setCompassEnabled(true);
+        locate();
         mapcontainer.addView(mview,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         mapcontainer.addView(cover,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         vview=LayoutInflater.from(this).inflate(R.layout.vidview,null);
@@ -245,6 +285,78 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 }
             }
         });
+        setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapcontain.setVisibility(View.GONE);
+                djcontain.setVisibility(View.VISIBLE);
+                navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
+                drawerLayout.openDrawer(Gravity.RIGHT);
+            }
+        });
+        layer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mapcontain.setVisibility(View.VISIBLE);
+                djcontain.setVisibility(View.GONE);
+                navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
+                drawerLayout.openDrawer(Gravity.RIGHT);
+            }
+        });
+        locate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                locate();
+            }
+        });
+        pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(Main.this,PicManager.class);
+                startActivity(intent);
+            }
+        });
+        user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent();
+                if(Net.getNet().getUserInfoOutput()==null){
+                    intent.setClass(Main.this,Login.class);
+                }
+                else{
+                    intent.setClass(Main.this, Infomation.class);
+                }
+                startActivity(intent);
+            }
+        });
+        offline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Main.this,
+                        com.amap.api.maps.offlinemap.OfflineMapActivity.class));
+            }
+        });
+        standard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                aMap.setMapType(AMap.MAP_TYPE_NORMAL);
+            }
+        });
+        satelite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
+            }
+        });
+        night.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                aMap.setMapType(AMap.MAP_TYPE_NIGHT);
+            }
+        });
+
+
+
     }
 
 
@@ -257,8 +369,6 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         view4=LayoutInflater.from(this).inflate(R.layout.bateryoption,null);
         view5=LayoutInflater.from(this).inflate(R.layout.bateryoption,null);
         views=new View[]{view1,view2,view3,view4,view5};
-
-
         channelist=(RecyclerView)view3.findViewById(R.id.channelist);
     }
 
@@ -443,6 +553,23 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    }
+
+
+
+//    回到中心位置
+    private void locate(){
+        //参数依次是：视角调整区域的中心点坐标、希望调整到的缩放级别(3-19)、俯仰角0°~45°（垂直与地图时为0）、偏航角 0~360° (正北方为0)
+        aMap.clear();
+        aMap.addMarker(new MarkerOptions().position(latLng).title("无人机").snippet("DefaultMarker"));
+        CameraUpdate cameraUpdate=CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng,19,20,0));
+        aMap.moveCamera(cameraUpdate);
+    }
+//    控件绑定
+    private void viewBind(){
+        wifistate.onWifiSignalChange(100);
+        baterystate.onBatteryPercentageChange(99);
+
     }
 
 }

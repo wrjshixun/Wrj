@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    buildToolsVersion '27.0.3'
     compileSdkVersion 25
     defaultConfig {
         applicationId "com.example.yuanshuai.wrj"
@@ -17,6 +18,7 @@ android {
     }
     buildTypes {
         release {
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -43,7 +45,29 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
-    buildToolsVersion '27.0.3'
+    signingConfigs {
+
+        Properties properties=new Properties();
+        InputStream inputStream=project.rootProject.file('local.properties').newDataInputStream();
+        properties.load(inputStream)
+        def sdkDir=properties.getProperty('STORE_FILE')
+        def key_keyAlias=properties.getProperty('KEY_ALIAS')
+        def key_keyPassword=properties.getProperty('KEY_PASSWORD')
+        def key_storePassword=properties.getProperty('STORE_PASSWORD')
+
+//        release {
+//            storeFile file(sdkDir)
+//            storePassword key_storePassword
+//            keyAlias key_keyAlias
+//            keyPassword key_keyPassword
+//        }
+//        debug {
+//            storeFile file('C:\\Users\\yuanshuai\\.android\\debug.keystore')
+////            storePassword key_storePassword
+////            keyAlias key_keyAlias
+////            keyPassword key_keyPassword
+//        }
+    }
 }
 
 dependencies {
@@ -52,8 +76,9 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
     implementation 'com.android.support:design:25.3.1'
-    implementation 'com.amap.api:map2d:latest.integration'
+    implementation 'com.amap.api:3dmap:latest.integration'
     implementation 'com.dji:dji-sdk:4.5.1'
+    implementation 'com.dji:dji-uxsdk:4.5.1'
     implementation 'com.squareup.retrofit2:retrofit:2.0.2'
     implementation 'com.squareup.retrofit2:adapter-rxjava:2.0.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
