@@ -194,7 +194,6 @@
                 android:id="@+id/wifistate"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="10dp"
                 android:padding="3dp"
                 />
 
@@ -202,7 +201,6 @@
                 android:id="@+id/baterystate"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginLeft="10dp"
                 android:padding="3dp"
                  />
             <TextView
@@ -238,9 +236,7 @@
             android:background="@color/topbar"
             android:layout_alignBaseline="@+id/l1"
             >
-
             <TextView
-                android:id="@+id/h"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -248,7 +244,6 @@
                 android:text="H:0.0M" />
 
             <TextView
-                android:id="@+id/d"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
