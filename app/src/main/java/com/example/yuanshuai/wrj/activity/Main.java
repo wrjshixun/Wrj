@@ -2,12 +2,13 @@ package com.example.yuanshuai.wrj.activity;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.SurfaceTexture;
-import android.icu.text.IDNA;
 import android.media.Image;
 import android.os.Handler;
+import android.os.Message;
 import android.os.PersistableBundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -17,12 +18,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,16 +30,16 @@ import android.widget.Toast;
 
 
 import com.amap.api.maps.AMap;
-import com.amap.api.maps.AMapOptions;
 import com.amap.api.maps.CameraUpdate;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptor;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
-import com.dji.mapkit.maps.DJIMap;
+import com.amap.api.maps.model.PolylineOptions;
 import com.example.yuanshuai.wrj.R;
 import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
@@ -50,6 +48,8 @@ import com.example.yuanshuai.wrj.model.UserInfoOutput;
 import com.example.yuanshuai.wrj.net.Net;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
@@ -65,7 +65,10 @@ import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
 import dji.ux.widget.BatteryWidget;
+import dji.ux.widget.ReturnHomeWidget;
+import dji.ux.widget.TakeOffWidget;
 import dji.ux.widget.WiFiSignalWidget;
+import dji.ux.widget.dashboard.DashboardWidget;
 
 public class Main extends AppCompatActivity implements TextureView.SurfaceTextureListener {
 
@@ -123,18 +126,45 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private RelativeLayout maptools;
     private LinearLayout offline;
     private LatLng latLng=new LatLng(36.66694, 117.14017);                           //无人机当前位置
+    private List latlngs=new ArrayList<LatLng>();
+    private float height=0;
 
     //    无人机
     private RelativeLayout dcontainer;
     private TextureView video;
     private View vview;
+    private FlightController flightController=null;
+    private Handler handler=new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Toast.makeText(Main.this, ""+handler, Toast.LENGTH_SHORT).show();
+            if(msg.what==0){
+                Toast.makeText(Main.this, ""+latLng.toString(), Toast.LENGTH_SHORT).show();
+                latlngs.add(latLng);
+                CameraUpdate cameraUpdate=CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng,19,20,0));
+                aMap.moveCamera(cameraUpdate);
+                aMap.setMapTextZIndex(2);
+                aMap.addPolyline((new PolylineOptions())
+                        //手动数据测试
+                        //.add(new LatLng(26.57, 106.71),new LatLng(26.14,105.55),new LatLng(26.58, 104.82), new LatLng(30.67, 104.06))
+                        //集合数据
+                        .addAll(latlngs)
+                        //线的宽度
+                        .width(10).setDottedLine(true).geodesic(true)
+                        //颜色
+                        .color(Color.argb(255,255,20,147)));
+            }
+            return false;
+        }
+    });
+    private Thread t;
 
 
 
 
 //    主页控件
-    private WiFiSignalWidget wifistate;
-    private BatteryWidget baterystate;
+    private ImageView wifistate;
+    private ImageView baterystate;
     private TextView batery;
     private TextView distance;
     private TextView h;
@@ -148,8 +178,8 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private ImageView detect;
     private ImageView v;                                                  //录像按钮
     private ImageView take;
-    private ImageView up;
-    private ImageView down;
+    private TakeOffWidget up;
+    private ReturnHomeWidget down;
 
 //  侧滑控件
     private ImageView standard;
@@ -160,7 +190,6 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
-    private Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -198,8 +227,8 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         channelAdapter=new ChannelAdapter(this);
         listname=(TextView)findViewById(R.id.settingname);
         container=(LinearLayout) findViewById(R.id.container);
-        wifistate=(WiFiSignalWidget) findViewById(R.id.wifistate);
-        baterystate=(BatteryWidget) findViewById(R.id.baterystate);
+        wifistate=(ImageView) findViewById(R.id.wifistate);
+        baterystate=(ImageView) findViewById(R.id.baterystate);
         batery=(TextView)findViewById(R.id.batery);
         distance=(TextView)findViewById(R.id.distance);
         h=(TextView)findViewById(R.id.h);
@@ -208,8 +237,8 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         hs=(TextView)findViewById(R.id.hs);
         pic=(ImageView)findViewById(R.id.pic);
         user=(ImageView)findViewById(R.id.user);
-        up=(ImageView)findViewById(R.id.up);
-        down=(ImageView)findViewById(R.id.down);
+        up=(TakeOffWidget) findViewById(R.id.up);
+        down=(ReturnHomeWidget) findViewById(R.id.down);
         v=(ImageView)findViewById(R.id.video);
         take=(ImageView)findViewById(R.id.take);
         detect=(ImageView)findViewById(R.id.detect);
@@ -356,6 +385,12 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         });
 
 
+//        起飞
+        up.onTakeOffEnable(true);
+        down.onReturnHomeEnable(true);
+
+
+
 
     }
 
@@ -424,7 +459,29 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
             if (!product.getModel().equals(Model.UNKNOWN_AIRCRAFT)) {
                 VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(mReceivedVideoDataCallBack);
             }
+            if(flightController==null){
+                Aircraft a=(Aircraft)product;
+                flightController=a.getFlightController();
+            }
+            if(t==null){
+                t=new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                            latLng=null;
+                            latLng=new LatLng(flightController.getState().getAircraftLocation().getLatitude(),flightController.getState().getAircraftLocation().getLongitude());
+                            height=flightController.getState().getAircraftLocation().getAltitude();
+                            handler.sendEmptyMessage(0);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                t.start();
+            }
         }
+
     }
 
     private void uninitPreviewer() {
@@ -433,6 +490,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
             // Reset the callback
             VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
         }
+
     }
     public void showToast(final String msg) {
         runOnUiThread(new Runnable() {
@@ -561,14 +619,17 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private void locate(){
         //参数依次是：视角调整区域的中心点坐标、希望调整到的缩放级别(3-19)、俯仰角0°~45°（垂直与地图时为0）、偏航角 0~360° (正北方为0)
         aMap.clear();
-        aMap.addMarker(new MarkerOptions().position(latLng).title("无人机").snippet("DefaultMarker"));
+        aMap.addMarker(new MarkerOptions().position(latLng).title("无人机").snippet("DefaultMarker").icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.locate2))));
         CameraUpdate cameraUpdate=CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng,19,20,0));
         aMap.moveCamera(cameraUpdate);
     }
 //    控件绑定
     private void viewBind(){
-        wifistate.onWifiSignalChange(100);
-        baterystate.onBatteryPercentageChange(99);
+//        wifistate.onWifiSignalChange(100);
+//        baterystate.onBatteryPercentageChange(50);
+//        baterystate.onBatteryPercentageChange();
+        DashboardWidget dashboardWidget;
+
 
     }
 

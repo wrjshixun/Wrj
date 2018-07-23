@@ -11,12 +11,15 @@ import android.widget.Toast;
 
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
+import dji.keysdk.KeyManager;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.products.Aircraft;
 import dji.sdk.products.HandHeld;
 import dji.sdk.sdkmanager.DJISDKManager;
+import dji.ux.widget.BatteryWidget;
+import dji.ux.widget.WiFiSignalWidget;
 
 
 public class MyFPVApplication extends Application {
@@ -27,7 +30,6 @@ public class MyFPVApplication extends Application {
     private BaseProduct.BaseProductListener mDJIBaseProductListener;
     private BaseComponent.ComponentListener mDJIComponentListener;
     private static BaseProduct mProduct;
-    private static DJISDKManager djisdkManager;
     public Handler mHandler;
 
     private Application instance;
@@ -55,8 +57,6 @@ public class MyFPVApplication extends Application {
         }
         return mProduct;
     }
-//    获取wifi状态
-
 
     public static synchronized Camera getCameraInstance() {
 
@@ -64,7 +64,7 @@ public class MyFPVApplication extends Application {
 
         Camera camera = null;
 
-        if (getProductInstance() instanceof Aircraft) {
+        if (getProductInstance() instanceof Aircraft){
             camera = ((Aircraft) getProductInstance()).getCamera();
 
         } else if (getProductInstance() instanceof HandHeld) {
@@ -73,7 +73,6 @@ public class MyFPVApplication extends Application {
 
         return camera;
     }
-
 
     @Override
     public void onCreate() {
@@ -92,7 +91,7 @@ public class MyFPVApplication extends Application {
             @Override
             public void onComponentChange(BaseProduct.ComponentKey key, BaseComponent oldComponent, BaseComponent newComponent) {
 
-                if (newComponent != null) {
+                if(newComponent != null) {
                     newComponent.setComponentListener(mDJIComponentListener);
                 }
                 notifyStatusChange();
@@ -116,7 +115,7 @@ public class MyFPVApplication extends Application {
             @Override
             public void onRegister(DJIError error) {
 
-                if (error == DJISDKError.REGISTRATION_SUCCESS) {
+                if(error == DJISDKError.REGISTRATION_SUCCESS) {
 
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
@@ -148,7 +147,7 @@ public class MyFPVApplication extends Application {
             public void onProductChange(BaseProduct oldProduct, BaseProduct newProduct) {
 
                 mProduct = newProduct;
-                if (mProduct != null) {
+                if(mProduct != null) {
                     mProduct.setBaseProductListener(mDJIBaseProductListener);
                 }
 
@@ -181,4 +180,5 @@ public class MyFPVApplication extends Application {
             getApplicationContext().sendBroadcast(intent);
         }
     };
+
 }

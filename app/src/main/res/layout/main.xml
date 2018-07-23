@@ -2,6 +2,7 @@
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,7 +15,6 @@
         <RelativeLayout
             android:id="@+id/vedio_contain"
             android:layout_width="match_parent"
-
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"></RelativeLayout>
@@ -56,7 +56,7 @@
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
             android:padding="5dp"
-            android:src="@mipmap/take"
+            android:src="@mipmap/takeg"
             android:layout_marginBottom="20dp"
             android:layout_toRightOf="@+id/video"
             android:layout_marginLeft="20dp"
@@ -75,14 +75,35 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
-            android:padding="5dp"
-            android:src="@color/back1"
+            android:padding="1dp"
+            android:src="@mipmap/detect"
             android:layout_marginBottom="20dp"
             android:layout_toLeftOf="@+id/video"
             android:layout_marginRight="20dp"
             android:id="@+id/detect"
             />
 
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_marginLeft="15dp"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_centerVertical="true">-->
+            <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                <!--android:layout_width="40dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:src="@color/topbar"-->
+                <!--android:layout_marginBottom="7dp"-->
+                <!--/>-->
+            <!--<de.hdodenhof.circleimageview.CircleImageView-->
+                <!--android:layout_width="40dp"-->
+                <!--android:layout_height="40dp"-->
+                <!--android:src="@color/topbar"-->
+                <!--android:layout_marginTop="7dp"-->
+                <!--/>-->
+        <!--</LinearLayout>-->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,39 +112,16 @@
             android:layout_marginLeft="15dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true">
-            <de.hdodenhof.circleimageview.CircleImageView
+            <dji.ux.widget.TakeOffWidget
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@color/topbar"
-                android:layout_marginBottom="7dp"
-                />
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@color/topbar"
-                android:layout_marginTop="7dp"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true">
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@mipmap/up"
                 android:padding="5dp"
                 android:id="@+id/up"
                 android:layout_marginBottom="7dp"
                 />
-            <de.hdodenhof.circleimageview.CircleImageView
+            <dji.ux.widget.ReturnHomeWidget
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@mipmap/down"
                 android:padding="5dp"
                 android:id="@+id/down"
                 android:layout_marginTop="7dp"
@@ -190,18 +188,22 @@
             android:layout_marginTop="10dp"
             android:id="@+id/l1">
 
-            <dji.ux.widget.WiFiSignalWidget
+            <ImageView
                 android:id="@+id/wifistate"
                 android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:padding="3dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="5dp"
+                android:src="@mipmap/wifi3"
                 />
 
-            <dji.ux.widget.BatteryWidget
+            <ImageView
                 android:id="@+id/baterystate"
                 android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
                 android:padding="3dp"
+                android:src="@mipmap/battery5"
+
                  />
             <TextView
                 android:layout_width="wrap_content"
@@ -236,7 +238,9 @@
             android:background="@color/topbar"
             android:layout_alignBaseline="@+id/l1"
             >
+
             <TextView
+                android:id="@+id/h"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -244,6 +248,7 @@
                 android:text="H:0.0M" />
 
             <TextView
+                android:id="@+id/d"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -332,7 +337,7 @@
                     android:id="@+id/close"
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@color/back1"
+                    android:background="@mipmap/closew"
                     android:onClick="closeDrawer"/>
             </LinearLayout>
             <TextView
@@ -440,7 +445,7 @@
                     android:layout_height="15dp"
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@color/back1"
+                    android:background="@mipmap/closew"
                     android:layout_marginRight="20dp"
                     />
             </LinearLayout>
@@ -460,8 +465,9 @@
                 android:orientation="vertical">
                 <ImageView
                     android:layout_width="35dp"
+                    android:layout_marginTop="10dp"
                     android:layout_height="35dp"
-                    android:src="@mipmap/setting"
+                    android:src="@mipmap/settingw"
                     android:layout_gravity="center_horizontal"
                     android:padding="5dp"/>
                 <android.support.v7.widget.RecyclerView
@@ -496,10 +502,12 @@
                         android:layout_marginLeft="20dp"
                         android:textColor="@color/white"/>
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:id="@+id/close2"
-                        android:background="@color/back1"
+                        android:background="@mipmap/closew"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="5dp"
                         android:padding="5dp"
                         android:onClick="closeDrawer"/>
                 </LinearLayout>

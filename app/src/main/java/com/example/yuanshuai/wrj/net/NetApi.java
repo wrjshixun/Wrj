@@ -38,6 +38,9 @@ public interface NetApi {
     @GET(commonurl+"getUserInfo")
     Observable<Output<UserInfoOutput>> getUserInfo(@Query("id")String id);
 
+    @POST("")
+    Observable<Output> a();
+
 
 
 

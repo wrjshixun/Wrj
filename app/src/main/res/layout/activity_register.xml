@@ -6,16 +6,17 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="1"
-    android:background="@color/graytext"
+    android:background="@mipmap/back"
     tools:context=".activity.Register">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         >
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@color/back1"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@mipmap/backw"
+            android:layout_marginTop="10dp"
             android:id="@+id/back"
             android:onClick="click"
             android:layout_alignParentLeft="true"
@@ -59,24 +60,28 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="70dp"
+                android:textColor="@color/white"
                 android:hint="用户名"
                 android:id="@+id/name"/>
             <EditText
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/password"
+                android:textColor="@color/white"
                 android:layout_below="@+id/name"
                 android:hint="密码"/>
             <EditText
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/confirmPassword"
+                android:textColor="@color/white"
                 android:layout_below="@+id/password"
                 android:hint="确认密码"/>
             <Button
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:text="注册"
+                android:background="#6f888686"
                 android:onClick="click"
                 android:id="@+id/register"
                 android:textSize="18sp"

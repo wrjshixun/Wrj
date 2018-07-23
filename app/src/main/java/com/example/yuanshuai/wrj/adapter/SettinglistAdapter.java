@@ -19,8 +19,8 @@ public class SettinglistAdapter extends RecyclerView.Adapter<SettinglistAdapter.
     private Context context;
     private OnItemClickListener onItemClickListener=null;
     private int defItem=-1;
-    int[] list_select=new int[]{R.mipmap.take,R.mipmap.option,R.mipmap.wifi_n,R.mipmap.batery_n,R.mipmap.setting};
-    int[] list_notselect=new int[]{R.mipmap.take_select,R.mipmap.option_select,R.mipmap.wifi_select,R.mipmap.batery_select,R.mipmap.setting};
+    int[] list_select=new int[]{R.mipmap.takew,R.mipmap.optionw,R.mipmap.wifiw,R.mipmap.batteryw,R.mipmap.dian};
+    int[] list_notselect=new int[]{R.mipmap.takeb,R.mipmap.optionb,R.mipmap.wifib,R.mipmap.batteryb,R.mipmap.dian};
     public SettinglistAdapter(Context context) {
         super();
         this.context=context;
