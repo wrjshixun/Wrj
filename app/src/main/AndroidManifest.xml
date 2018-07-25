@@ -96,7 +96,9 @@
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activity.Infomation" />
-        <activity android:name=".activity.PicManager"></activity>
+        <activity android:name=".activity.PicManager"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" ></activity>
     </application>
 
 </manifest>

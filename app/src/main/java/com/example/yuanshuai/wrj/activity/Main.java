@@ -42,6 +42,7 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.PolylineOptions;
 import com.example.yuanshuai.wrj.R;
 import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
+import com.example.yuanshuai.wrj.adapter.PiclistAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
 import com.example.yuanshuai.wrj.application.MyFPVApplication;
 import com.example.yuanshuai.wrj.model.UserInfoOutput;
@@ -97,12 +98,15 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     //    设置列表
     private RecyclerView settinglist;
 
+
     //    信道列表
     private RecyclerView channelist;
     //    设置页面容器
     private LinearLayout container;
     private SettinglistAdapter settinglistAdapter;
     private ChannelAdapter channelAdapter;
+
+
     private TextView listname;
 
     //    侧滑页的五个子页面
@@ -111,6 +115,9 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private View view3;
     private View view4;
     private View view5;
+
+    private View view6;
+
     private View[] views=null;
     //    主页侧滑开关
     private ImageView setting;
@@ -220,6 +227,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         mapcontainer=(RelativeLayout)findViewById(R.id.map_contain);
         dcontainer=(RelativeLayout)findViewById(R.id.vedio_contain);
         settinglist=(RecyclerView)findViewById(R.id.settinglist);
+
         maptools=(RelativeLayout)findViewById(R.id.maptools);
         offline=(LinearLayout)findViewById(R.id.offline);
         layer=(ImageView)findViewById(R.id.layer);
@@ -269,6 +277,8 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         channelAdapter.setDefItem(0);
         container.addView(views[0],new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         settinglist.setAdapter(settinglistAdapter);
+
+
         navigationView.setLayoutParams(new DrawerLayout.LayoutParams(1500, DrawerLayout.LayoutParams.MATCH_PARENT,Gravity.RIGHT));
         mview=LayoutInflater.from(this).inflate(R.layout.mapview,null);
         map=(MapView) mview.findViewById(R.id.map);
@@ -403,9 +413,11 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         view3=LayoutInflater.from(this).inflate(R.layout.wifioption,null);
         view4=LayoutInflater.from(this).inflate(R.layout.bateryoption,null);
         view5=LayoutInflater.from(this).inflate(R.layout.bateryoption,null);
+
         views=new View[]{view1,view2,view3,view4,view5};
         channelist=(RecyclerView)view3.findViewById(R.id.channelist);
     }
+
 
     @Override
     protected void onPause() {

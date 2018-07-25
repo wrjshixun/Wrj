@@ -4,11 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/back"
     tools:context=".activity.PicManager">
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/picmanagelist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_centerHorizontal="true"
+    android:textColor="@color/white"
+    android:textSize="15sp"
     android:text="图片管理"/>
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@mipmap/backw"
+        android:layout_marginTop="10dp"
+        android:id="@+id/back"
+        android:onClick="click"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"
+/>
 
 
 </RelativeLayout>
