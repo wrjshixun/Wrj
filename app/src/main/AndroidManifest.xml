@@ -41,14 +41,14 @@
     <application
         android:name=".application.MApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@mipmap/logo"
+        android:label="DronePlus"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="250ca3aaf6a9b7cbc4eba358edf49f2b" />
+            android:value="d64aeffddfc1d47a6ba6aebef2660de8" />
         <!-- DJI SDK -->
         <uses-library android:name="com.android.future.usb.accessory" />
 
