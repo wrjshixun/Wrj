@@ -775,7 +775,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.e(TAG, "onSurfaceTextureDestroyed");
+        Log.e(TAG,"onSurfaceTextureDestroyed");
         if (mCodecManager != null) {
             mCodecManager.cleanSurface();
             mCodecManager = null;

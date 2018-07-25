@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.PicActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:layout_toRightOf="@+id/picfileback"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="5dp"
+        android:text="图片"/>
+    <ImageView
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:background="@mipmap/backg"
+        android:layout_marginTop="10dp"
+        android:id="@+id/picfileback"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:text="上传     "/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/picfilelist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"/>
+
+</RelativeLayout>
