@@ -38,6 +38,11 @@ public class PicManager extends AppCompatActivity {
         picdatalist.add("时长");
         picdatalist.add("图片");
         picdatalist.add("视频");
+        picdatalist.add("第一次飞行");
+        picdatalist.add("2018/07/17");
+        picdatalist.add("30:36");
+        picdatalist.add("1");
+        picdatalist.add("2");
     }
     public void add(){
         picdatalist.add("TestMyItem");

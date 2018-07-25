@@ -68,9 +68,10 @@
                 android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED"
                 android:resource="@xml/accessory_filter" />
         </activity>
-        <!--离线地图-->
-        <activity android:name="com.amap.api.maps.offlinemap.OfflineMapActivity"
-            android:screenOrientation="portrait"  />
+        <!-- 离线地图 -->
+        <activity
+            android:name="com.amap.api.maps.offlinemap.OfflineMapActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name="dji.sdk.sdkmanager.DJIGlobalService" />
 
@@ -96,9 +97,16 @@
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".activity.Infomation" />
-        <activity android:name=".activity.PicManager"
+        <activity
+            android:name=".activity.PicManager"
             android:screenOrientation="landscape"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" ></activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".activity.PicActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".activity.VidActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
     </application>
 
 </manifest>

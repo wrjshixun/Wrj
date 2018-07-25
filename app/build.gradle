@@ -47,13 +47,13 @@ android {
     }
     signingConfigs {
 
-        Properties properties=new Properties();
-        InputStream inputStream=project.rootProject.file('local.properties').newDataInputStream();
+        Properties properties = new Properties();
+        InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream();
         properties.load(inputStream)
-        def sdkDir=properties.getProperty('STORE_FILE')
-        def key_keyAlias=properties.getProperty('KEY_ALIAS')
-        def key_keyPassword=properties.getProperty('KEY_PASSWORD')
-        def key_storePassword=properties.getProperty('STORE_PASSWORD')
+        def sdkDir = properties.getProperty('STORE_FILE')
+        def key_keyAlias = properties.getProperty('KEY_ALIAS')
+        def key_keyPassword = properties.getProperty('KEY_PASSWORD')
+        def key_storePassword = properties.getProperty('STORE_PASSWORD')
 
 //        release {
 //            storeFile file(sdkDir)
