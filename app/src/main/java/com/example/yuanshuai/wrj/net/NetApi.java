@@ -2,6 +2,9 @@ package com.example.yuanshuai.wrj.net;
 
 
 
+import com.example.yuanshuai.wrj.model.CityZone;
+import com.example.yuanshuai.wrj.model.Drone;
+import com.example.yuanshuai.wrj.model.ListModel;
 import com.example.yuanshuai.wrj.model.Output;
 import com.example.yuanshuai.wrj.model.UserInfoOutput;
 
@@ -37,9 +40,14 @@ public interface NetApi {
 //    获取用户信息
     @GET(commonurl+"getUserInfo")
     Observable<Output<UserInfoOutput>> getUserInfo(@Query("id")String id);
+//    无人机型号列表
+    @GET(commonurl+"droneModelList")
+    Observable<Output<ListModel<Drone>>> droneModelList();
+//    地区列表
+    @GET(commonurl+"cityZoneList")
+    Observable<Output<ListModel<CityZone>>> cityZoneList(@Query("page")int page,@Query("size")int size,@Query("type")int type,@Query("parentId")int id);
 
-    @POST("")
-    Observable<Output> a();
+
 
 
 

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
@@ -54,6 +55,7 @@ import com.example.yuanshuai.wrj.application.MyFPVApplication;
 import com.example.yuanshuai.wrj.model.UserInfoOutput;
 import com.example.yuanshuai.wrj.net.Net;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.airlink.SignalQualityCallback;
 import dji.common.battery.BatteryState;
+import dji.common.camera.SettingsDefinitions;
 import dji.common.camera.SystemState;
 import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
@@ -71,6 +74,7 @@ import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
+import dji.sdk.camera.DownloadListener;
 import dji.sdk.camera.MediaFile;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
@@ -114,7 +118,6 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private List<String> missingPermission = new ArrayList<>();
     private static final int REQUEST_PERMISSION_CODE = 12345;
 
-
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private RelativeLayout cover;
@@ -146,6 +149,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 //    b为true的时候，小地图，开启监听事件，b为false的时候，大地图，禁用监听事件
 
     //    地图
+    private PolylineOptions polylineOptions=new PolylineOptions();
     private MapView map;
     private AMap aMap;
     private UiSettings uiSettings;
@@ -163,25 +167,25 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private View vview;
     private int times=0;
     private FlightController flightController = null;
+    private FlightControllerState f=null;
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            Toast.makeText(Main.this, "" + handler, Toast.LENGTH_SHORT).show();
-            if (msg.what == 0) {
-                Toast.makeText(Main.this, "" + latLng.toString(), Toast.LENGTH_SHORT).show();
-                latlngs.add(latLng);
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(new CameraPosition(latLng, 19, 20, 0));
-                aMap.moveCamera(cameraUpdate);
-                aMap.setMapTextZIndex(2);
-                aMap.addPolyline((new PolylineOptions())
-                        //手动数据测试
-                        //.add(new LatLng(26.57, 106.71),new LatLng(26.14,105.55),new LatLng(26.58, 104.82), new LatLng(30.67, 104.06))
-                        //集合数据
-                        .addAll(latlngs)
-                        //线的宽度
-                        .width(10).setDottedLine(true).geodesic(true)
-                        //颜色
-                        .color(Color.argb(255, 255, 20, 147)));
+            switch (msg.what){
+                case 1:
+                    h.setText("H:"+f.getAircraftLocation().getAltitude()+"M");
+                    hs.setText("H.S:"+Math.sqrt(Math.pow(f.getVelocityX(),2)+Math.pow(f.getVelocityY(),2)));
+                    vs.setText("V.S:"+f.getVelocityZ());
+                    locate();
+                    aMap.setMapTextZIndex(2);
+                    aMap.addPolyline((new PolylineOptions())
+                            .addAll(latlngs)
+                            .width(10).setDottedLine(true).geodesic(true)
+                            .color(Color.argb(255, 255, 20, 147)));
+
+                    break;
+                default:
+                    break;
             }
             return false;
         }
@@ -418,6 +422,20 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 //        起飞
         up.onTakeOffEnable(true);
         down.onReturnHomeEnable(true);
+        take.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureAction();
+            }
+        });
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startRecord();
+            }
+        });
+
+//        initDate();
 
 
 
@@ -501,35 +519,31 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                     @Override
                     public void onUpdate(BatteryState batteryState) {
                         int i=batteryState.getCurrent()*100/batteryState.getFullChargeCapacity();
-                        updateBattery(i);
+//                        updateBattery(i);
                     }
                 });
                 aircraft.getFlightController().setStateCallback(new FlightControllerState.Callback() {
                     @Override
                     public void onUpdate(@NonNull FlightControllerState flightControllerState) {
                         times++;
-                        if(times==20){
+                        if(times==10){
                             times=0;
                             if(flightControllerState!=null){
                                 if(flightControllerState.isFlying()&&flightControllerState.getAircraftLocation()!=null){
                                     latLng=new LatLng(flightControllerState.getAircraftLocation().getLatitude(),flightControllerState.getAircraftLocation().getLongitude());
-                                    aMap.addPolyline((new PolylineOptions())
-                                            .add(latLng)
-                                            //线的宽度
-                                            .width(10).setDottedLine(true).geodesic(true)
-                                            //颜色
-                                            .color(Color.argb(255, 255, 20, 147)));
-                                    locate();
-                                    h.setText("H:"+flightControllerState.getAircraftLocation().getAltitude()+"M");
+                                    latlngs.add(latLng);
+                                    Log.e("latlngsize",""+latlngs.size());
                                     if(height<flightControllerState.getAircraftLocation().getAltitude()){
                                         height=flightControllerState.getAircraftLocation().getAltitude();
                                     }
-                                    hs.setText("H.S:"+Math.sqrt(Math.pow(flightControllerState.getVelocityX(),2)+Math.pow(flightControllerState.getVelocityY(),2)));
-                                    vs.setText("V.S:"+flightControllerState.getVelocityZ());
+                                    f=flightControllerState;
+                                    handler.sendEmptyMessage(1);
+
+
 
                                 }
                                 else{
-
+                                    Toast.makeText(Main.this, "flightController null", Toast.LENGTH_SHORT).show();
                                 }
 
 
@@ -612,9 +626,46 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 //                    @NonNull final File destDir	File instance of location to save the files, which can not be null.
 //                    @Nullable String fileNameWithoutExtension	The fileName to store in mobile devices, without the file extension.<br> If it is null, the file name in the camera's SDCard will be used.
 //                    @NonNull final DownloadListener<String> callback	Completion callback that receives the execution result.
+                    File file=null;
                     if(mediaFile.getMediaType()== MediaFile.MediaType.JPEG||mediaFile.getMediaType()== MediaFile.MediaType.RAW_DNG){
-//                        mediaFile.fetchFileData();
+                        file=new File("/sdcard/wrj/pic");
+                        if(!file.exists()){
+                            file.mkdirs();
+                        }
+
                     }
+                    else if(mediaFile.getMediaType()== MediaFile.MediaType.MOV||mediaFile.getMediaType()== MediaFile.MediaType.MP4){
+                        file=new File("/sdcard/wrj/pic");
+                        if(!file.exists()){
+                            file.mkdirs();
+                        }
+                    }
+                    mediaFile.fetchFileData(file, mediaFile.getFileName(), new DownloadListener<String>() {
+                        @Override
+                        public void onStart() {
+                            Toast.makeText(Main.this, "开始下载", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onRateUpdate(long l, long l1, long l2) {
+
+                        }
+
+                        @Override
+                        public void onProgress(long l, long l1) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(String s) {
+                            Toast.makeText(Main.this, ""+"下载成功", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(DJIError djiError) {
+                            Toast.makeText(Main.this, ""+"下载失败", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
 
@@ -665,25 +716,19 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 @Override
                 public void onUpdate(BatteryState batteryState) {
                     int i=batteryState.getCurrent()*100/batteryState.getFullChargeCapacity();
-                    updateBattery(i);
+//                    updateBattery(i);
                 }
             });
             aircraft.getFlightController().setStateCallback(new FlightControllerState.Callback() {
                 @Override
                 public void onUpdate(@NonNull FlightControllerState flightControllerState) {
                     times++;
-                    if(times==20){
+                    if(times==10){
                         times=0;
                         if(flightControllerState!=null){
                             if(flightControllerState.isFlying()&&flightControllerState.getAircraftLocation()!=null){
                                 latLng=new LatLng(flightControllerState.getAircraftLocation().getLatitude(),flightControllerState.getAircraftLocation().getLongitude());
-                                aMap.addPolyline((new PolylineOptions())
-                                        .add(latLng)
-                                        //线的宽度
-                                        .width(10).setDottedLine(true).geodesic(true)
-                                        //颜色
-                                        .color(Color.argb(255, 255, 20, 147)));
-                                locate();
+                                latlngs.add(latLng);
                                 h.setText("H:"+flightControllerState.getAircraftLocation().getAltitude()+"M");
                                 if(height<flightControllerState.getAircraftLocation().getAltitude()){
                                     height=flightControllerState.getAircraftLocation().getAltitude();
@@ -861,6 +906,156 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         }
     }
 
+    private void captureAction(){
+
+        final Camera camera = MyFPVApplication.getCameraInstance();
+        if (camera != null) {
+            camera.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if(djiError==null){
+                        SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE; // Set the camera capture mode as Single mode
+                        camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback(){
+                            @Override
+                            public void onResult(DJIError djiError) {
+                                if (null == djiError) {
+                                    handler.postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            camera.startShootPhoto(new CommonCallbacks.CompletionCallback() {
+                                                @Override
+                                                public void onResult(DJIError djiError) {
+                                                    if (djiError == null) {
+                                                        showToast("take photo: success");
+                                                    } else {
+                                                        showToast(djiError.getDescription());
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }, 2000);
+                                }
+                            }
+                        });
+                    }
+                    else{
+                        showToast(djiError.getDescription());
+                    }
+                }
+            });
+
+        }
+        else{
+            showToast("未连接");
+        }
+    }
+
+    // Method for starting recording
+    private void startRecord(){
+
+        final Camera camera = MyFPVApplication.getCameraInstance();
+        if (camera != null) {
+            camera.setMode(SettingsDefinitions.CameraMode.RECORD_VIDEO, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if(null==djiError){
+                        camera.startRecordVideo(new CommonCallbacks.CompletionCallback(){
+                            @Override
+                            public void onResult(DJIError djiError)
+                            {
+                                if (djiError == null) {
+                                    showToast("Record video: success");
+                                    v.setImageResource(R.mipmap.stop);
+
+                                    v.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            stopRecord();
+                                        }
+                                    });
+                                }else {
+                                    showToast(djiError.getDescription());
+                                }
+                            }
+                        }); // Execute the startRecordVideo API
+                    }
+                    else{
+                        showToast(djiError.getDescription());
+                    }
+                }
+            });
+
+        }
+        else{
+            showToast("未连接");
+        }
+    }
+
+    // Method for stopping recording
+    private void stopRecord(){
+
+        Camera camera = MyFPVApplication.getCameraInstance();
+        if (camera != null) {
+            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback(){
+
+                @Override
+                public void onResult(DJIError djiError)
+                {
+                    if(djiError == null) {
+                        showToast("Stop recording: success");
+                        v.setImageResource(R.mipmap.video);
+                        v.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startRecord();
+                            }
+                        });
+                    }else {
+                        showToast(djiError.getDescription());
+                    }
+                }
+            }); // Execute the stopRecordVideo API
+        }
+
+    }
+    private void initDate(){
+        LatLng latLng1 = new LatLng(36.66694, 117.14017);                           //无人机当前位置
+        LatLng latLng2 = new LatLng(36.66700, 117.14017);
+        LatLng latLng3 = new LatLng(36.66704, 117.14017);
+        LatLng latLng4 = new LatLng(36.66708, 117.14017);
+        LatLng latLng5 = new LatLng(36.66710, 117.14017);
+        LatLng latLng6 = new LatLng(36.66712, 117.14017);
+        latlngs.add(latLng1);
+        latlngs.add(latLng2);
+        latlngs.add(latLng3);
+        latlngs.add(latLng4);
+        latlngs.add(latLng5);
+        latlngs.add(latLng6);
+        aMap.setMapTextZIndex(2);
+        aMap.addPolyline((new PolylineOptions())
+                .addAll(latlngs)
+                .width(10).setDottedLine(true).geodesic(true)
+                .color(Color.argb(255, 255, 20, 147)));
+        LatLng latLng7 = new LatLng(36.66712, 117.14017);                           //无人机当前位置
+        LatLng latLng8 = new LatLng(36.66716, 117.14017);
+        LatLng latLng9 = new LatLng(36.667720, 117.14017);
+        LatLng latLng10 = new LatLng(36.66724, 117.14017);
+        LatLng latLng11 = new LatLng(36.66728, 117.14017);
+        LatLng latLng12 = new LatLng(36.66732, 117.14017);
+        latlngs.add(latLng7);
+        latlngs.add(latLng8);
+        latlngs.add(latLng9);
+        latlngs.add(latLng10);
+        latlngs.add(latLng11);
+        latlngs.add(latLng12);
+        aMap.setMapTextZIndex(2);
+        aMap.addPolyline((new PolylineOptions())
+                .addAll(latlngs)
+                .width(10).setDottedLine(true).geodesic(true)
+                .color(Color.argb(255, 255, 20, 147)));
+
+
+    }
 }
 
 

@@ -75,7 +75,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
-            android:padding="1dp"
+            android:padding="5dp"
             android:src="@mipmap/detect"
             android:layout_marginBottom="20dp"
             android:layout_toLeftOf="@+id/video"
@@ -214,6 +214,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/batery"
+                android:textColor="@color/blacktext"
                 android:text="99%"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="center_vertical"/>
@@ -227,6 +228,7 @@
             <TextView
                 android:id="@+id/distance"
                 android:layout_width="wrap_content"
+                android:textColor="@color/blacktext"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="5dp"
@@ -249,6 +251,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:textColor="@color/blacktext"
                 android:layout_marginLeft="8dp"
                 android:text="H:0.0M" />
 
@@ -258,6 +261,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
+                android:textColor="@color/blacktext"
                 android:text="D:N/A" />
 
             <TextView
@@ -266,6 +270,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
+                android:textColor="@color/blacktext"
                 android:text="V.S:0.0M/S" />
 
             <TextView
@@ -273,6 +278,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:textColor="@color/blacktext"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="5dp"
                 android:text="H.S:0.0M/S" />

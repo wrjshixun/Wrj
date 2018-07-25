@@ -64,11 +64,18 @@ public class MyFPVApplication extends Application {
 
         Camera camera = null;
 
+//        Log.e("camera",""+getProductInstance().toString());
         if (getProductInstance() instanceof Aircraft){
             camera = ((Aircraft) getProductInstance()).getCamera();
 
         } else if (getProductInstance() instanceof HandHeld) {
             camera = ((HandHeld) getProductInstance()).getCamera();
+        }
+        try{
+            Log.e("camera",""+camera.toString());
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
 
         return camera;

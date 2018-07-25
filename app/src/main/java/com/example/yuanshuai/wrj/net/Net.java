@@ -2,6 +2,10 @@ package com.example.yuanshuai.wrj.net;
 
 
 
+import com.amap.api.maps.offlinemap.City;
+import com.example.yuanshuai.wrj.model.CityZone;
+import com.example.yuanshuai.wrj.model.Drone;
+import com.example.yuanshuai.wrj.model.ListModel;
 import com.example.yuanshuai.wrj.model.Output;
 import com.example.yuanshuai.wrj.model.UserInfoOutput;
 import com.google.gson.Gson;
@@ -109,6 +113,15 @@ public class Net {
 //    获取用户信息
     Observable<Output<UserInfoOutput>> getUserInfo(String id){
         return ret.getUserInfo(id);
+    }
+
+//    获取无人机列表
+    Observable<Output<ListModel<Drone>>> droneModelList(){
+        return ret.droneModelList();
+    }
+//    获取区域列表
+    Observable<Output<ListModel<CityZone>>> cityZoneList(int type,int parentid){
+        return ret.cityZoneList(0,10000,type,parentid);
     }
 
 }
