@@ -30,6 +30,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -214,9 +215,9 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private ReturnHomeWidget down;
 
     //  侧滑控件
-    private ImageView standard;
-    private ImageView satelite;
-    private ImageView night;
+    private CheckBox standard;
+    private CheckBox satelite;
+    private CheckBox night;
     private static final String TAG = "dj";
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
 
@@ -270,9 +271,9 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         v = (ImageView) findViewById(R.id.video);
         take = (ImageView) findViewById(R.id.take);
         detect = (ImageView) findViewById(R.id.detect);
-        standard = (ImageView) findViewById(R.id.standard);
-        satelite = (ImageView) findViewById(R.id.satellite);
-        night = (ImageView) findViewById(R.id.night);
+        standard = (CheckBox) findViewById(R.id.standard);
+        satelite = (CheckBox) findViewById(R.id.satellite);
+        night = (CheckBox) findViewById(R.id.night);
         init();
         settinglistAdapter = new SettinglistAdapter(this);
         settinglist.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -391,22 +392,29 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                         com.amap.api.maps.offlinemap.OfflineMapActivity.class));
             }
         });
+        standard.setChecked(true);
         standard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 aMap.setMapType(AMap.MAP_TYPE_NORMAL);
+                satelite.setChecked(false);
+                night.setChecked(false);
             }
         });
         satelite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
+                standard.setChecked(false);
+                night.setChecked(false);
             }
         });
         night.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 aMap.setMapType(AMap.MAP_TYPE_NIGHT);
+                standard.setChecked(false);
+                satelite.setChecked(false);
             }
         });
 

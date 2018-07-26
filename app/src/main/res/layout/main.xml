@@ -372,13 +372,12 @@
                     android:layout_gravity="center_vertical"
                     android:textSize="15sp"
                     android:textColor="@color/white"/>
-                <ImageView
+                <CheckBox
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginLeft="5dp"
                     android:id="@+id/standard"
                     android:layout_gravity="center_vertical"
-                    android:background="@color/back1"
                     android:layout_marginRight="20dp"
                     />
             </LinearLayout>
@@ -398,12 +397,11 @@
                     android:layout_gravity="center_vertical"
                     android:textSize="15sp"
                     android:textColor="@color/white"/>
-                <ImageView
+                <CheckBox
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@color/back1"
                     android:id="@+id/satellite"
                     android:layout_marginRight="20dp"
                     />
@@ -424,13 +422,12 @@
                     android:layout_gravity="center_vertical"
                     android:textSize="15sp"
                     android:textColor="@color/white"/>
-                <ImageView
+                <CheckBox
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="center_vertical"
                     android:id="@+id/night"
-                    android:background="@color/back1"
                     android:layout_marginRight="20dp"
                     />
             </LinearLayout>
@@ -456,7 +453,7 @@
                     android:layout_height="15dp"
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="center_vertical"
-                    android:background="@mipmap/closew"
+                    android:background="@color/back1"
                     android:layout_marginRight="20dp"
                     />
             </LinearLayout>
