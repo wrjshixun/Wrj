@@ -49,6 +49,10 @@ import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.PolylineOptions;
+import com.amap.api.maps.model.TileOverlay;
+import com.amap.api.maps.model.TileOverlayOptions;
+import com.amap.api.maps.model.TileProvider;
+import com.amap.api.maps.model.UrlTileProvider;
 import com.example.yuanshuai.wrj.R;
 import com.example.yuanshuai.wrj.adapter.ChannelAdapter;
 import com.example.yuanshuai.wrj.adapter.SettinglistAdapter;
@@ -57,6 +61,8 @@ import com.example.yuanshuai.wrj.model.UserInfoOutput;
 import com.example.yuanshuai.wrj.net.Net;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -150,6 +156,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
 //    b为true的时候，小地图，开启监听事件，b为false的时候，大地图，禁用监听事件
 
     //    地图
+    private TileOverlay tileOverlay;
     private PolylineOptions polylineOptions=new PolylineOptions();
     private MapView map;
     private AMap aMap;
@@ -218,6 +225,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
     private CheckBox standard;
     private CheckBox satelite;
     private CheckBox night;
+    private CheckBox google;
     private static final String TAG = "dj";
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
 
@@ -273,6 +281,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
         detect = (ImageView) findViewById(R.id.detect);
         standard = (CheckBox) findViewById(R.id.standard);
         satelite = (CheckBox) findViewById(R.id.satellite);
+        google=(CheckBox)findViewById(R.id.google);
         night = (CheckBox) findViewById(R.id.night);
         init();
         settinglistAdapter = new SettinglistAdapter(this);
@@ -399,6 +408,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 aMap.setMapType(AMap.MAP_TYPE_NORMAL);
                 satelite.setChecked(false);
                 night.setChecked(false);
+//                google.setChecked(false);
             }
         });
         satelite.setOnClickListener(new View.OnClickListener() {
@@ -407,6 +417,7 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
                 standard.setChecked(false);
                 night.setChecked(false);
+//                google.setChecked(false);
             }
         });
         night.setOnClickListener(new View.OnClickListener() {
@@ -415,6 +426,19 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 aMap.setMapType(AMap.MAP_TYPE_NIGHT);
                 standard.setChecked(false);
                 satelite.setChecked(false);
+//                google.setChecked(false);
+            }
+        });
+        google.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(google.isChecked()){
+                    removeGoogle();
+                }
+                else{
+                    addGoogle();
+                }
+
             }
         });
 
@@ -1063,6 +1087,34 @@ public class Main extends AppCompatActivity implements TextureView.SurfaceTextur
                 .color(Color.argb(255, 255, 20, 147)));
 
 
+    }
+//    添加google图层
+    private void addGoogle(){
+        final String url = "http://mt0.google.cn/vt/lyrs=m@198&hl=zh-CN&gl=cn&src=app&x=%d&y=%d&z=%d&s=";
+        TileProvider tileProvider = new UrlTileProvider(256, 256) {
+            public URL getTileUrl(int x, int y, int zoom) {
+                try {
+                    return new URL(String.format(url, x, y, zoom));
+                } catch (MalformedURLException e) {
+                }
+                return null;
+            }
+        };
+
+        if (tileProvider != null) {
+            tileOverlay = aMap.addTileOverlay( new TileOverlayOptions()
+                    .tileProvider(tileProvider)
+                    .diskCacheEnabled(true)
+                    .diskCacheDir("/storage/emulated/0/amap/cache")
+                    .diskCacheSize(100000)
+                    .memoryCacheEnabled(true)
+                    .memCacheSize(100000))
+            ;
+
+        }
+    }
+    private void removeGoogle(){
+        tileOverlay.remove();
     }
 }
 
