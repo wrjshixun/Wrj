@@ -18,6 +18,17 @@
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"></RelativeLayout>
+
+        <com.example.yuanshuai.wrj.Views.OverlayView
+            android:id="@+id/tracking_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.example.yuanshuai.wrj.Views.OverlayView
+            android:id="@+id/debug_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
         <RelativeLayout
             android:layout_width="150dp"
             android:layout_height="90dp"
